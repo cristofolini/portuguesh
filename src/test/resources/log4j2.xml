@@ -8,10 +8,13 @@
         <Console name="ConsoleAppender" target="SYSTEM_OUT">
             <PatternLayout pattern="%-5level - %msg%n%throwable"/>
         </Console>
+        <File name="FileAppender" fileName="logs/portuguesh.log">
+            <PatternLayout pattern="%-7level - %msg%n"/>
+        </File>
     </Appenders>
     <Loggers>
         <Root level="TRACE">
-            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="FileAppender"/>
         </Root>
     </Loggers>
 </Configuration>
