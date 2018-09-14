@@ -13,15 +13,13 @@ import java.util.List;
 
 public class PortugueshErrorListener extends BaseErrorListener {
 	static final PortugueshErrorListener INSTANCIA = new PortugueshErrorListener();
-
-	public List<String> mensagensDeErro = new ArrayList<>();
+	boolean dirtyBit = false;
 
 	@Override
 	public void syntaxError(Recognizer<?,?> recognizer, Object simboloProblematico, int linha, int posicaoNaLinha, String msg, RecognitionException e) throws ParseCancellationException {
 		Logger logger = LogManager.getLogger(getClass());
 
-		logger.log(Level.forName("PARSER", 375), "linha:coluna -> " + linha + ":" + posicaoNaLinha + " " + msg);
-		//mensagensDeErro.add("linha:coluna -> " + linha + ":" + posicaoNaLinha + " " + msg);
-		//throw new ParseCancellationException("linha:coluna -> " + linha + ":" + posicaoNaLinha + " " + msg);
+		logger.log(Level.forName("PARSER ERROR", 375), "linha:coluna -> " + linha + ":" + posicaoNaLinha + " " + msg);
+		this.dirtyBit = true;
 	}
 }
