@@ -1,7 +1,12 @@
 grammar Portuguesh ;
-prog        : program+ ;
-program     : (function | declaration | conditional | loop | COMMENT)+ ;
-declaration : ((DEF NAME EQUAL value) | (NAME EQUAL value)) NEW_LINE ;
+
+@header {
+import org.antlr.symtab.*;
+}
+
+prog returns [Scope scope]        : program+ ;
+program returns [Scope scope]     : (function | declaration | conditional | loop | COMMENT)+ ;
+declaration returns [Scope scope] : ((DEF name=NAME EQUAL value) | (name=NAME EQUAL value)) NEW_LINE ;
 value       : (QUOTATION (LETTER | DIGIT)+ QUOTATION | NUMBER) ;
 conditional : (IF L_SQBRACKET condition R_SQBRACKET COLON NEW_LINE declaration+ (ELSE declaration+)? END_IF) NEW_LINE ;
 loop        : (WHILE L_SQBRACKET condition R_SQBRACKET COLON NEW_LINE declaration+ END_WHILE) NEW_LINE ;
