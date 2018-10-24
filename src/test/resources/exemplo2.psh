@@ -1,5 +1,7 @@
-função texto asd (a, c):
+seja z = 9
+função texto s (a, c):
     se [a == c]:
         seja b = 1
+        z = 2
     es
 oãçnuf

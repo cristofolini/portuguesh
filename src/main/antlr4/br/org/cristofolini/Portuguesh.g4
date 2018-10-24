@@ -4,69 +4,45 @@ grammar Portuguesh ;
 import org.antlr.symtab.*;
 }
 
-prog returns [Scope scope]        : program+ ;
-program returns [Scope scope]     : (function | declaration | conditional | loop | COMMENT)+ ;
-declaration returns [Scope scope] : ((DEF name=NAME EQUAL value) | (name=NAME EQUAL value)) NEW_LINE ;
-value       : (QUOTATION (LETTER | DIGIT)+ QUOTATION | NUMBER) ;
-conditional : (IF L_SQBRACKET condition R_SQBRACKET COLON NEW_LINE declaration+ (ELSE declaration+)? END_IF) NEW_LINE ;
-loop        : (WHILE L_SQBRACKET condition R_SQBRACKET COLON NEW_LINE declaration+ END_WHILE) NEW_LINE ;
-condition   : (NAME | value | LOGICAL) comparator? (NAME | value | LOGICAL) ;
-comparator  : (LESSER | LESSEREQUAL | GREATER | GREATEREQUAL | EQUAL | EQUALEQUAL | DIFFERENT | AND | OR | NOT) ;
-function    : (FUNC (STRING | NUMERICAL) NAME (L_PARENT (parameter COMMA?)* R_PARENT)? COLON) NEW_LINE (declaration | conditional | loop)* (RETURN NAME)? END_FUNC NEW_LINE ;
-parameter   : NAME ;
+file returns [Scope scope]
+    : (function | declaration | attribution | conditional | loop | comment)+ EOF
+    ;
+declaration
+    : 'seja' ID '=' value NEW_LINE
+    ;
+attribution
+    : ID '=' value NEW_LINE
+    ;
+value
+    : ('"' (LETTER | DIGIT)+ '"' | DIGIT+)
+    ;
+conditional
+    : ('se' '[' condition ']' ':' NEW_LINE (declaration | attribution)+ ('senao' (declaration | attribution)+)? 'es') NEW_LINE
+    ;
+loop
+    : ('enquanto' '[' condition ']' ':' NEW_LINE (declaration | attribution)+ 'otnauqne') NEW_LINE
+    ;
+condition
+    : (ID | value | LOGICAL) comparator? (ID | value | LOGICAL)
+    ;
+comparator
+    : '<' | '<=' | '>' | '>=' | '=' | '==' | '!=' | '&' | '|' | '!'
+    ;
+function
+    : ('função' TYPE ID ('(' (parameter ','?)* ')')? ':') NEW_LINE (declaration | attribution | conditional | loop)* ('retorne' ID)? 'oãçnuf' NEW_LINE
+    ;
+parameter
+    : ID
+    ;
+comment
+    : '#' ~( NEW_LINE )*
+    ;
 
-PLUS 	  : '+' ;
-MINUS	  : '-' ;
-MULT	  : '*' ;
-DIV		  : '/' ;
-DEF		  : 'seja';
-IF		  : 'se';
-ELSE      : 'senao';
-END_IF    : 'es';
-WHILE	  : 'enquanto';
-END_WHILE : 'otnauqne';
-FUNC      : 'função';
-END_FUNC  : 'oãçnuf';
-RETURN    : 'retorne';
-STRING    : 'texto';
-NUMERICAL : 'número';
-HASH      : '#';
-AND		  : '&';
-NOT		  : '!';
-OR		  : '|';
-TRUE	  : 'verdadeiro';
-FALSE     : 'falso';
-PRINT     : 'diga';
-PLUSPLUS	: '++' ;
-MINUSMINUS	: '--' ;
-MODULO		: '%';
-L_SQBRACKET	: '[';
-R_SQBRACKET	: ']';
-L_PARENT	: '(';
-R_PARENT    : ')';
-COLON		: ':';
-COMMA		: ',';
-DOT		    : '.';
-SEMICOLON	: ';';
-QUOTATION   : '"';
-GREATER		: '>';
-LESSER		: '<';
-EQUALEQUAL	: '==';
-DIFFERENT	: '!=';
-GREATEREQUAL	: '>=';
-LESSEREQUAL	: '<=';
-EQUAL		: '=';
+ID        : [a-z] ;
+TYPE      : 'texto' | 'número' ;
 NEW_LINE    : ('\n'|'\r');
-WS          : (' '|'\t') -> channel(HIDDEN);
-
-TYPE        : STRING | NUMERICAL ;
-NAME        : LETTER+ ;
-NUMBER      : DIGIT+ ;
-LOGICAL     : TRUE | FALSE ;
-OPERATOR    : PLUS | MINUS | MULT | DIV | MODULO ;
-COMPARATOR  : LESSER | LESSEREQUAL | GREATER | GREATEREQUAL | EQUAL | EQUALEQUAL | DIFFERENT | AND | OR | NOT ;
-COMMENT     : HASH ~( '\r' | '\n' )* ;
-
+WS          : (' '|'\t') -> skip;
+LOGICAL     : 'verdadeiro' | 'falso' ;
 LETTER : 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G'
        | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N'
        | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U'

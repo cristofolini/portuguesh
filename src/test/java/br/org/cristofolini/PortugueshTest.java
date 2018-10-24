@@ -4,6 +4,7 @@ import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,9 +23,9 @@ public class PortugueshTest
         PortugueshParser p = new PortugueshParser(new CommonTokenStream(l));
 
         p.addErrorListener(PortugueshErrorListener.INSTANCIA);
-        p.addParseListener(new PortugueshParseTreeListener());
+        p.addParseListener(PortugueshParseTreeListener.INSTANCIA);
         p.setBuildParseTree(true);
-        ParseTree tree = p.prog();
+        ParseTree tree = p.file();
         //System.out.println(tree.toStringTree(p));
         //logger.log(Level.forName("PARSE TREE", 375), tree.toStringTree(p));
         if (PortugueshErrorListener.INSTANCIA.dirtyBit) throw new ParseCancellationException();
@@ -40,6 +41,9 @@ public class PortugueshTest
         frame.setSize(200,200);
         frame.setVisible(true);
         logger.log(Level.forName("PARSE TREE", 375), tree.toStringTree(p));
+        PortugueshParseTreeListener walkerListener = new PortugueshParseTreeListener();
+        ParseTreeWalker walker = new ParseTreeWalker();
+        walker.walk(walkerListener, tree);
     }
 
     @Test
@@ -50,7 +54,7 @@ public class PortugueshTest
         p.addErrorListener(PortugueshErrorListener.INSTANCIA);
         //p.setErrorHandler(new PortugueshErrorStrategy());
         p.addParseListener(new PortugueshParseTreeListener());
-        p.prog();
+        p.file();
         if (PortugueshErrorListener.INSTANCIA.dirtyBit) throw new ParseCancellationException();
     }
 }
