@@ -49,6 +49,13 @@ public class PortugueshParseTreeListener extends PortugueshBaseListener {
         super.exitDeclaration(ctx);
     }
 
+    @Override
+    public void enterAttribution(PortugueshParser.AttributionContext ctx) {
+        if (ctx.ID() != null) {
+            if (currentScope.getSymbol(ctx.ID().getText()) == null) logger.log(Level.forName("SEMANTIC ERROR", 394), ctx.ID().getText() + " is not defined");
+        }
+    }
+
     private void pushScope(Scope scope) {
         currentScope = scope;
         System.out.println("entering: " + currentScope.getName() + ":" + scope);

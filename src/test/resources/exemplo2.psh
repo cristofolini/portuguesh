@@ -1,4 +1,5 @@
 seja z = 9
+f = 5
 função texto s (a, c):
     se [a == c]:
         seja b = 1

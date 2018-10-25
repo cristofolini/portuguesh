@@ -40,8 +40,8 @@ comment
 
 ID        : [a-z] ;
 TYPE      : 'texto' | 'número' ;
-NEW_LINE    : ('\n'|'\r');
-WS          : (' '|'\t') -> skip;
+NEW_LINE    : ('\n'|'\r') ;
+WS          : (' '|'\t') -> skip ;
 LOGICAL     : 'verdadeiro' | 'falso' ;
 LETTER : 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G'
        | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N'
