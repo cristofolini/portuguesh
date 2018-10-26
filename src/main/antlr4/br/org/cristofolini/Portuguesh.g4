@@ -14,7 +14,7 @@ attribution
     : ID '=' value NEW_LINE
     ;
 value
-    : ('"' (LETTER | DIGIT)+ '"' | DIGIT+)
+    : ('"' (LETTER | DIGIT) '"' | DIGIT)
     ;
 conditional
     : ('se' '[' condition ']' ':' NEW_LINE (declaration | attribution)+ ('senao' (declaration | attribution)+)? 'es') NEW_LINE
@@ -23,13 +23,19 @@ loop
     : ('enquanto' '[' condition ']' ':' NEW_LINE (declaration | attribution)+ 'otnauqne') NEW_LINE
     ;
 condition
-    : (ID | value | LOGICAL) comparator? (ID | value | LOGICAL)
+    : operand comparator? operand
+    ;
+operand
+    : (ID | value | LOGICAL)
     ;
 comparator
     : '<' | '<=' | '>' | '>=' | '=' | '==' | '!=' | '&' | '|' | '!'
     ;
-function
-    : ('função' TYPE ID ('(' (parameter ','?)* ')')? ':') NEW_LINE (declaration | attribution | conditional | loop)* ('retorne' ID)? 'oãçnuf' NEW_LINE
+function returns [Scope scope]
+    : ('função' TYPE ID ('(' (parameter ','?)* ')')? ':') NEW_LINE block 'oãçnuf' NEW_LINE
+    ;
+block returns [Scope scope]
+    : (declaration | attribution | conditional | loop)* ('retorne' ID NEW_LINE)?
     ;
 parameter
     : ID

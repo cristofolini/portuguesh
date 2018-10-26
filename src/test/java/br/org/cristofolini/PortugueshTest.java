@@ -22,24 +22,25 @@ public class PortugueshTest
         PortugueshLexer l = new PortugueshLexer(new ANTLRInputStream(getClass().getResourceAsStream("/exemplo2.psh")));
         PortugueshParser p = new PortugueshParser(new CommonTokenStream(l));
 
+        ParseTree tree = p.file();
         p.addErrorListener(PortugueshErrorListener.INSTANCIA);
         p.addParseListener(PortugueshParseTreeListener.INSTANCIA);
         p.setBuildParseTree(true);
-        ParseTree tree = p.file();
+
         //System.out.println(tree.toStringTree(p));
         //logger.log(Level.forName("PARSE TREE", 375), tree.toStringTree(p));
         if (PortugueshErrorListener.INSTANCIA.dirtyBit) throw new ParseCancellationException();
 
-        JFrame frame = new JFrame("Antlr AST");
-        JPanel panel = new JPanel();
-        TreeViewer viewr = new TreeViewer(Arrays.asList(
-                p.getRuleNames()),tree);
-        viewr.setScale(1.5);//scale a little
-        panel.add(viewr);
-        frame.add(panel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(200,200);
-        frame.setVisible(true);
+//        JFrame frame = new JFrame("Antlr AST");
+//        JPanel panel = new JPanel();
+//        TreeViewer viewr = new TreeViewer(Arrays.asList(
+//                p.getRuleNames()),tree);
+//        viewr.setScale(1.5);//scale a little
+//        panel.add(viewr);
+//        frame.add(panel);
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        frame.setSize(200,200);
+//        frame.setVisible(true);
         logger.log(Level.forName("PARSE TREE", 375), tree.toStringTree(p));
         PortugueshParseTreeListener walkerListener = new PortugueshParseTreeListener();
         ParseTreeWalker walker = new ParseTreeWalker();
