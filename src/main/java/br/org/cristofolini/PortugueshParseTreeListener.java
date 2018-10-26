@@ -9,6 +9,9 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Iterator;
+import java.util.List;
+
 public class PortugueshParseTreeListener extends PortugueshBaseListener {
     Logger logger = LogManager.getLogger(getClass());
     PrimitiveType stringType = new PrimitiveType("texto");
@@ -85,6 +88,30 @@ public class PortugueshParseTreeListener extends PortugueshBaseListener {
     @Override
     public void enterFunction(PortugueshParser.FunctionContext ctx) {
         FunctionSymbol f = new FunctionSymbol(ctx.ID().getText());
+        if (ctx.TYPE() != null) {
+            if (ctx.TYPE().getText().equals(stringType.getName())) f.setType(stringType);
+            if (ctx.TYPE().getText().equals(numberType.getName())) f.setType(numberType);
+            logger.log(Level.forName("SYMBOL", 395), f.getName() + " of TYPE " + f.getType());
+        }
+
+        List scopeSymbols = currentScope.getAllSymbols();
+        Type returnType = new PrimitiveType("");
+        if (ctx.block() != null){
+            if (ctx.block().ID() != null) {
+                for (Iterator<VariableSymbol> symbols = scopeSymbols.iterator(); symbols.hasNext();) {
+                    VariableSymbol s = symbols.next();
+                    if (s.getType().equals(stringType)) returnType = stringType;
+                    if (s.getType().equals(numberType)) returnType = numberType;
+                }
+//                String actualReturnType = a.getType().getName();
+//                if (actualReturnType != null) {
+//                    if (actualReturnType.equals(stringType.getName())) returnType = stringType;
+//                    if (actualReturnType.equals(numberType.getName())) returnType = numberType;
+//                }
+            }
+        }
+        if (returnType != f.getType()) logger.log(Level.forName("SEMANTIC ERROR", 394), "Return variable is of the wrong type");
+
         f.setEnclosingScope(currentScope);
         currentScope.define(f);
         ctx.scope = f;
