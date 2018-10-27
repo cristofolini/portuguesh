@@ -1,12 +1,13 @@
 seja z = 9
 f = 5
-seja z = 5
+# seja z = 5
 seja j = "j"
 função texto s (a, c):
     seja x = "x"
+    seja h = 8
     se [a == c]:
         seja b = 1
-        z = 2
+        y = 2
     es
-    retorne x
+    retorne z
 oãçnuf

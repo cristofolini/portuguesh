@@ -1,16 +1,11 @@
 package br.org.cristofolini;
 
-//import org.antlr.v4.runtime.ParserRuleContext;
-//import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.symtab.*;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.Iterator;
-import java.util.List;
 
 public class PortugueshParseTreeListener extends PortugueshBaseListener {
     Logger logger = LogManager.getLogger(getClass());
@@ -91,26 +86,8 @@ public class PortugueshParseTreeListener extends PortugueshBaseListener {
         if (ctx.TYPE() != null) {
             if (ctx.TYPE().getText().equals(stringType.getName())) f.setType(stringType);
             if (ctx.TYPE().getText().equals(numberType.getName())) f.setType(numberType);
-            logger.log(Level.forName("SYMBOL", 395), f.getName() + " of TYPE " + f.getType());
+            logger.log(Level.forName("SYMBOL", 395), f.getName() + " - FUNCTION of TYPE " + f.getType());
         }
-
-        List scopeSymbols = currentScope.getAllSymbols();
-        Type returnType = new PrimitiveType("");
-        if (ctx.block() != null){
-            if (ctx.block().ID() != null) {
-                for (Iterator<VariableSymbol> symbols = scopeSymbols.iterator(); symbols.hasNext();) {
-                    VariableSymbol s = symbols.next();
-                    if (s.getType().equals(stringType)) returnType = stringType;
-                    if (s.getType().equals(numberType)) returnType = numberType;
-                }
-//                String actualReturnType = a.getType().getName();
-//                if (actualReturnType != null) {
-//                    if (actualReturnType.equals(stringType.getName())) returnType = stringType;
-//                    if (actualReturnType.equals(numberType.getName())) returnType = numberType;
-//                }
-            }
-        }
-        if (returnType != f.getType()) logger.log(Level.forName("SEMANTIC ERROR", 394), "Return variable is of the wrong type");
 
         f.setEnclosingScope(currentScope);
         currentScope.define(f);
@@ -120,6 +97,21 @@ public class PortugueshParseTreeListener extends PortugueshBaseListener {
 
     @Override
     public void exitFunction(PortugueshParser.FunctionContext ctx) {
+        FunctionSymbol functionSymbol = (FunctionSymbol) currentScope.getEnclosingScope().getSymbol(currentScope.getName());
+        if (ctx.block() != null){
+            if (ctx.block().ID() != null) {
+                String returnName = ctx.block().ID().getText();
+                VariableSymbol returnSymbol = (VariableSymbol) ctx.block().scope.getSymbol(returnName);
+                if (returnSymbol == null) returnSymbol = (VariableSymbol) currentScope.getEnclosingScope().getSymbol(returnName);
+                if (returnSymbol == null) logger.log(Level.forName("SEMANTIC ERROR", 394), "Return variable (" + returnSymbol.getName() + ") is not present in the current scope");
+                else {
+                    if (returnSymbol.getName().equals(returnName)) {
+                        if (functionSymbol.getType() != returnSymbol.getType()) logger.log(Level.forName("SEMANTIC ERROR", 394), "Return variable (" + returnSymbol.getName() + ") is of the wrong type");
+                    }
+                }
+            }
+        }
+
         popScope();
     }
 
