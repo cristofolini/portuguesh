@@ -56,15 +56,17 @@ public class PortugueshParseTreeListener extends PortugueshBaseListener {
 
     @Override
     public void enterCondition(PortugueshParser.ConditionContext ctx) {
+        VariableSymbol operand0 = new VariableSymbol("");
+        VariableSymbol operand1  = new VariableSymbol("");
+
         if (ctx.operand(0) != null) {
             if (ctx.operand(0).ID() != null) {
                 if (currentScope.getSymbol(ctx.operand(0).ID().getText()) == null) {
                     logger.log(Level.forName("SEMANTIC ERROR", 394), ctx.operand(0).getText() + " is not defined in this scope");
                     return;
+                } else {
+                    operand0 = (VariableSymbol) currentScope.getSymbol(ctx.operand(0).ID().getText());
                 }
-            }
-            if (ctx.operand(0).value() != null) {
-                //TODO: compare types
             }
         }
         if (ctx.operand(1) != null) {
@@ -72,12 +74,12 @@ public class PortugueshParseTreeListener extends PortugueshBaseListener {
                 if (currentScope.getSymbol(ctx.operand(1).ID().getText()) == null) {
                     logger.log(Level.forName("SEMANTIC ERROR", 394), ctx.operand(1).getText() + " is not defined in this scope");
                     return;
+                } else {
+                    operand1 = (VariableSymbol) currentScope.getSymbol(ctx.operand(1).ID().getText());
                 }
             }
-            if (ctx.operand(1).value() != null) {
-                //TODO: compare types
-            }
         }
+        if (operand0.getType() != operand1.getType()) logger.log(Level.forName("SEMANTIC ERROR", 394), "Operands (" + operand0.getName() + ", " + operand1.getName() + ") are of different types");
     }
 
     @Override
@@ -143,6 +145,4 @@ public class PortugueshParseTreeListener extends PortugueshBaseListener {
         currentScope = currentScope.getEnclosingScope();
         if (currentScope != null) System.out.println("leaving: " + currentScope.getName() + ":" + currentScope);
     }
-
-//    @Override public void visitErrorNode(ErrorNode node) { logger.log(Level.forName("TOKEN ERROR", 375), node.toString()); }
 }

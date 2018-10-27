@@ -2,10 +2,11 @@ seja z = 9
 f = 5
 # seja z = 5
 seja j = "j"
-função texto s (a, c):
+função texto s ():
     seja x = "x"
+    seja d = "d"
     seja h = 8
-    se [a == c]:
+    se [x == d]:
         seja b = 1
         y = 2
     es
