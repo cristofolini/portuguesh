@@ -7,11 +7,19 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
 public class PortugueshParseTreeListener extends PortugueshBaseListener {
     Logger logger = LogManager.getLogger(getClass());
     PrimitiveType stringType = new PrimitiveType("texto");
     PrimitiveType numberType = new PrimitiveType("número");
     Scope currentScope;
+
+    private static final String fileName = "out/program.j";
+    private FileWriter fileWriter;
+    private PrintWriter printWriter;
 
     static final PortugueshParseTreeListener INSTANCIA = new PortugueshParseTreeListener();
 
@@ -24,11 +32,25 @@ public class PortugueshParseTreeListener extends PortugueshBaseListener {
     public void enterFile(@NotNull PortugueshParser.FileContext ctx) {
         GlobalScope globalScope = new GlobalScope(null);
         ctx.scope = globalScope;
+
+        try {
+            fileWriter = new FileWriter(fileName);
+            printWriter = new PrintWriter(fileWriter);
+            printWriter.println(".class public program/Main");
+            printWriter.println(".super java/lang/Object\n");
+            printWriter.println(".method public static main([Ljava/lang/String;)V");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         pushScope(globalScope);
     }
 
     @Override
     public void exitFile(@NotNull PortugueshParser.FileContext ctx) {
+        printWriter.println("return");
+        printWriter.println(".end method");
+        printWriter.close();
         popScope();
     }
 
