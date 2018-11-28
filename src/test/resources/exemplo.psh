@@ -1,7 +1,6 @@
 seja a = 1
 seja b = 2
 seja c = 3
-
-se [a + b == c]:
-    # lógica
+se [b <= c]:
+    c = 4
 es

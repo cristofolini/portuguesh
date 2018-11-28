@@ -19,7 +19,7 @@ public class PortugueshTest
 
     @Test
     public void testExemplo() throws Exception {
-        PortugueshLexer l = new PortugueshLexer(new ANTLRInputStream(getClass().getResourceAsStream("/exemplo2.psh")));
+        PortugueshLexer l = new PortugueshLexer(new ANTLRInputStream(getClass().getResourceAsStream("/exemplo.psh")));
         PortugueshParser p = new PortugueshParser(new CommonTokenStream(l));
 
         ParseTree tree = p.file();
