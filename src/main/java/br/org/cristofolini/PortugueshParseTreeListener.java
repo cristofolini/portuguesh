@@ -28,6 +28,8 @@ public class PortugueshParseTreeListener extends PortugueshBaseListener {
     private static final String JASMIN_STRING_FIELD = " Ljava/lang/String; ";
 
     private int condCount = 1;
+    private int loopCount = 1;
+    private int localVariableCount = 1;
 
     static final PortugueshParseTreeListener INSTANCIA = new PortugueshParseTreeListener();
 
@@ -57,6 +59,8 @@ public class PortugueshParseTreeListener extends PortugueshBaseListener {
     @Override
     public void exitFile(@NotNull PortugueshParser.FileContext ctx) {
         printWriter.println("return");
+        printWriter.println(".limit stack 10");
+        printWriter.println(".limit locals 10");
         printWriter.println(".end method");
         printWriter.close();
         popScope();
@@ -73,11 +77,15 @@ public class PortugueshParseTreeListener extends PortugueshBaseListener {
             if (ctx.value().getText() != null) {
                 if (ctx.value().getText().startsWith("\"")) {
                     v.setType(stringType);
+                    printWriter.println("ldc " + ctx.value().getText());
                 }
                 else {
                     v.setType(numberType);
+                    printWriter.println("ldc " + ctx.value().getText());
+                    printWriter.println("istore " + localVariableCount);
+                    localVariableCount++;
+                    variableValues.put(v.getName(), ctx.value().getText());
                 }
-                variableValues.put(v.getName(), ctx.value().getText());
             }
             currentScope.define(v);
             logger.log(Level.forName("SYMBOL", 395), v.getName() + " of TYPE " + v.getType());
@@ -87,6 +95,21 @@ public class PortugueshParseTreeListener extends PortugueshBaseListener {
     @Override
     public void exitDeclaration(@NotNull PortugueshParser.DeclarationContext ctx) {
         super.exitDeclaration(ctx);
+    }
+
+    @Override
+    public void enterConditional(PortugueshParser.ConditionalContext ctx) {
+        printWriter.println("ldc " + variableValues.get(ctx.condition().operand(0).getText()));
+        printWriter.println("ldc " + variableValues.get(ctx.condition().operand(1).getText()));
+        String comparator = ctx.condition().comparator().getText();
+        String jasminComparator = getJasminComparator(comparator);
+        printWriter.println(jasminComparator + "CondOut" + condCount);
+    }
+
+    @Override
+    public void exitConditional(PortugueshParser.ConditionalContext ctx) {
+        printWriter.println("CondOut" + condCount + ":");
+        condCount++;
     }
 
     @Override
@@ -115,40 +138,12 @@ public class PortugueshParseTreeListener extends PortugueshBaseListener {
             }
         }
         if (operand0.getType() != operand1.getType()) logger.log(Level.forName("SEMANTIC ERROR", 394), "Operands (" + operand0.getName() + ", " + operand1.getName() + ") are of different types");
-        printWriter.println("ldc " + variableValues.get(operand0.getName()));
-        printWriter.println("ldc " + variableValues.get(operand1.getName()));
-        String comparator = ctx.comparator().getText();
-        String jasminComparator;
-        switch (comparator) {
-            case "!=":
-                jasminComparator = "if_icmpeq ";
-                break;
-            case "==":
-                jasminComparator = "if_icmpne ";
-                break;
-            case "<":
-                jasminComparator = "if_icmpge ";
-                break;
-            case ">":
-                jasminComparator = "if_icmple ";
-                break;
-            case "<=":
-                jasminComparator = "if_icmpgt ";
-                break;
-            case ">=":
-                jasminComparator = "if_icmplt ";
-                break;
-
-            default:
-                jasminComparator = "if_acmpeq";
-        }
-        printWriter.println(jasminComparator + "CondOut" + condCount);
     }
 
     @Override
     public void exitCondition(PortugueshParser.ConditionContext ctx) {
-        printWriter.println("CondOut" + condCount + ":");
-        condCount++;
+//        printWriter.println("CondOut" + condCount + ":");
+//        condCount++;
     }
 
     @Override
@@ -206,6 +201,23 @@ public class PortugueshParseTreeListener extends PortugueshBaseListener {
         }
     }
 
+    @Override
+    public void enterLoop(PortugueshParser.LoopContext ctx) {
+        printWriter.println("Loop" + loopCount + ":");
+    }
+
+    @Override
+    public void exitLoop(PortugueshParser.LoopContext ctx) {
+        printWriter.println("ldc " + variableValues.get(ctx.condition().operand(0).getText()));
+        printWriter.println("ldc " + variableValues.get(ctx.condition().operand(1).getText()));
+
+        String comparator = ctx.condition().comparator().getText();
+        String jasminComparator = getJasminComparator(comparator);
+        printWriter.println(jasminComparator + "Loop" + loopCount);
+        loopCount++;
+    }
+
+
     private void pushScope(Scope scope) {
         currentScope = scope;
         System.out.println("entering: " + currentScope.getName() + ":" + scope);
@@ -214,5 +226,25 @@ public class PortugueshParseTreeListener extends PortugueshBaseListener {
     private void popScope() {
         currentScope = currentScope.getEnclosingScope();
         if (currentScope != null) System.out.println("leaving: " + currentScope.getName() + ":" + currentScope);
+    }
+
+    private String getJasminComparator(String comparator) {
+        switch (comparator) {
+            case "!=":
+                return "if_icmpeq ";
+            case "==":
+                return  "if_icmpne ";
+            case "<":
+                return  "if_icmpge ";
+            case ">":
+                return  "if_icmple ";
+            case "<=":
+                return  "if_icmpgt ";
+            case ">=":
+                return  "if_icmplt ";
+
+            default:
+                return  "if_acmpeq";
+        }
     }
 }

@@ -1,6 +1,11 @@
 seja a = 1
 seja b = 2
 seja c = 3
+seja d = "2"
 se [b <= c]:
-    c = 4
+    seja e = 4
 es
+
+enquanto [b <= c]:
+    a = 2
+otnauqne
